@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=dvice-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<link rel="apple-touch-icon" href="./testIcon.png"/>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+	<script type="text/javascript" src="./jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" src="./map.js"></script>
+	<script type="text/javascript" src="./main.js"></script>
+	<title>Project14 for mobile</title>
+</head>
+<body onload="initialize()">
+	<div id="map"></div>
+	<div id="boatList"></div>
+	<div id="AISList"></div>
+	<div id="actionBar">
+		<p id="showBoatList" onclick="showBoatList()">タグボート一覧</p>
+		<p id="showAISList" onclick="showAISList()">AIS船舶一覧</p>
+	</div>
+	<div id="rightList"></div>
+</body>
+</html>
