@@ -1,10 +1,8 @@
-var map,latlng,myOptions,line=[];//マップ
-var tagboat = [];//タグボードの情報
-tagboat["02"]=[];tagboat["02"]=["かえで","#F72020","./icon/red.png."];
-tagboat["03"]=[];tagboat["03"]=["さくら","#FFD1CB","./icon/pink.png."];
-tagboat["05"]=[];tagboat["05"]=["はりま","#4B3FFA","./icon/blue.png."];
-tagboat["06"]=[];tagboat["06"]=["ともえ","#FAA33F","./icon/orange.png."];
-
+var map,latlng,myOptions,line=[],linePath=[],tagboat=[],ships=[];//マップ
+tagboat["02"]=[];tagboat["02"]=["かえで","#F72020","./icon/red.png.02"];
+tagboat["03"]=[];tagboat["03"]=["さくら","#FFD1CB","./icon/pink.png.03"];
+tagboat["05"]=[];tagboat["05"]=["はりま","#4B3FFA","./icon/blue.png.05"];
+tagboat["06"]=[];tagboat["06"]=["ともえ","#FAA33F","./icon/orange.png.06"];
 //マップの初期設定を行う関数
 function initialize()
 {
@@ -36,8 +34,6 @@ function getJSON()
 				success: function(data) 
 				{
 						console.log("success!!");
-						//マップ再表示
-						refleshMap();
 						//ピンとラインをセット
 						setLineAndPin(data);
 						//船の情報を更新
@@ -62,7 +58,6 @@ function reloadTime()
 function setLineAndPin(data)
 {
 	line = [];
-	var pline = [];
 	for(var key in data[0])
 	{
 		line[key]=[];
@@ -80,29 +75,35 @@ function setLineAndPin(data)
 			tagboat[key][1] = "#A0FF2D";
 			tagboat[key][2] = "./icon/green.png";
 		}
-		else
-		{
-			tagboat[key][2] += key;
-		}
 
-			//先ほど作成した配列をそれぞれの船ごとに代入
-		pline[key] = new google.maps.Polyline({ 
-			path: line[key], 
-			strokeColor: tagboat[key][1], 
-			strokeOpacity: 1.0, 
-			strokeWeight: 2 }); 
-			//船に合わせたアイコン作成
-		var icon = new google.maps.MarkerImage(tagboat[key][2]); 
-			//アイコンを設定
-		new google.maps.Marker({
-			position: line[key][line[key].length-1],
-			map: map,
-			icon:icon,
-			title: tagboat[key][0],
-			zIndex: 4
-		});
-		//アイコンをマップに投影
-		pline[key].setMap(map); 
+		//マップ上のラインオブジェクト新規作成
+		if(linePath[key] == 'undefined' || linePath[key] == null)
+		{
+			linePath[key] = new google.maps.Polyline({ 
+				path: line[key], 
+				strokeColor: tagboat[key][1], 
+				strokeOpacity: 1.0, 
+				strokeWeight: 2 }); 
+			linePath[key].setMap(map); 
+		}//既存の場合は更新
+		else
+			linePath[key].setPath(line[key]);
+
+		//マップ上のピンオブジェクト新規作成
+		if(ships[key] == 'undefined' || ships[key] == null)
+		{
+			var icon = new google.maps.MarkerImage(tagboat[key][2]); 
+				//アイコンを設定
+			ships[key]=new google.maps.Marker({
+				position: line[key][line[key].length-1],
+				map: map,
+				icon:icon,
+				title: tagboat[key][0],
+				zIndex: 4
+			});
+		}//既存の場合は位置を更新
+		else
+			ships[key].setPosition(line[key][line[key].length-1]);
 	}
 }
 
@@ -157,15 +158,4 @@ function checkReStartList()
 			map.setCenter(center);
 		});
 	});
-}
-
-//マップを再表示する際に利用する。
-function refleshMap()
-{
-	//マップ初期化
-	var center = map.getCenter();
-	var zoom = map.getZoom();
-	map = new google.maps.Map(document.getElementById("map"), myOptions);
-	map.setCenter(center);
-	map.setZoom(zoom);
 }
